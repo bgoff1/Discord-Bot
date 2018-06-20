@@ -78,5 +78,16 @@ const dadjokes = [
     "What's the difference between a steak and a shooting star? One is meaty and the other is a little meteor.",
     "Why do Norweigian ships have barcodes on them? So they can Scandinavian"
 ];
+function tellJoke(bot, channelID)
+{
+    let joke = dadjokes[Math.floor(Math.random() * dadjokes.length)];
+    if (bot && channelID)
+    {
+        bot.sendMessage({
+            to: channelID,
+            message: `${joke}`
+        })
+    }
+}
 const names = ["Kiddo", "Son", "Chief", "Jimbo", "Boy", "Boss"];
-module.exports = { dadjokes, names};
+module.exports = { dadjokes, names, tellJoke };
