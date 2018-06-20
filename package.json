@@ -1,0 +1,17 @@
+{
+    "name": "dad-and-meme-bot",
+    "version": "1.0.0",
+    "description": "A dad and meme bot",
+    "main": "bot.js",
+    "author": "Judah Goff",
+    "dependencies": {
+        "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
+        "winston": "^2.4.0"
+    },
+    "devDependencies": {
+        "nodemon": "^1.17.5"
+    },
+    "scripts": {
+        "start": "nodemon bot.js"
+    }
+}
