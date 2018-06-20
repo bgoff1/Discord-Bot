@@ -52,7 +52,7 @@ const dadjokes = [
     "The fattest knight at King Arthur's round table was Sir Cumference.He acquired his size from too much pi.",
     "Did you see they made round bails of hay illegal in Wisconsin? It's because the cows weren't getting a square meal.",
     "NURSE: \"Blood type?\" DAD: \"Red.\"", 
-    "SERVER: \"Sorry about your wait. DAD \"Are you saying I'm fat?\"",
+    "SERVER: \"Sorry about your wait.\" DAD \"Are you saying I'm fat?\"",
     "KID: \"Dad, make me a sandwich!\" DAD: \"Poof, you're a sandwich!\"",
     "What do you call a fish with two knees? A \"two - knee\" fish",
     "You know what the loudest pet you can get is? A trumpet.",

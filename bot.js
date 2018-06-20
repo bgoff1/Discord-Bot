@@ -62,7 +62,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     let name = dad.names[Math.floor(Math.random() * dad.names.length)];
                     bot.sendMessage({
                         to: channelID,
-                        message: `You got it ${name}!`
+                        message: `You got it ${name}! :ok_hand:`
                     });
             }
         }
