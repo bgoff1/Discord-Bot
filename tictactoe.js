@@ -4,11 +4,11 @@ let board = [ "1" ,  "2"  , "3"  ,
 
 function printBoard(bot, channelID) 
 {
-    let boardToPrint = "";
+    let boardToPrint = "\n----------------------\n";
     let a = 0;
     for (let spot = 0; spot < board.length / 3; spot++)
     {
-        for (let i = 1; i < 12; ++i)
+        for (let i = 0; i <= 12; ++i)
         {
             if (i % 4 == 0)
             {
@@ -19,12 +19,11 @@ function printBoard(bot, channelID)
                 ++a;
             }
             else {
-                boardToPrint += " ";
+                boardToPrint += "\t";
             }
         }
-        boardToPrint += "\n----------\n";
+        boardToPrint += "\n----------------------\n";
     }
-    console.log("a");
     bot.sendMessage({
         to: channelID,
         message: `${boardToPrint}`
@@ -44,66 +43,125 @@ function makeMoveUser(bot, message, channelID)
             message: `You cannot move in spot ${message}. Pick another location.`
         });
     }
-    console.log("done moving");
-    makeMoveAI(bot, message, channelID);
+    if (!findWinner('X', board))
+        makeMoveAI();
 }
 
-function makeMoveAI(bot, channelID)
+function makeMoveAI()
 {
-    console.log("moving ai");
-    let spot = Math.floor(Math.random() * board.length);
-    let count = 0;
-    while (count < 100 && board[spot] == 'X' || board[spot] == 'O') 
+    let spot;
+    // if its the second move and the player went in the middle
+    if (getMoveCount() == 1 && board[4] != '5')
     {
-        spot = Math.floor(Math.random() * board.length);
-        ++count;
+        let rand = Math.floor(Math.random() * 4) + 1;
+        switch (rand)
+        {
+            case 1:
+                spot = 0;
+                board[0] = 'O';
+                break;
+            case 2:
+                spot = 2;
+                board[2] = 'O';
+                break;
+            case 3:
+                spot = 6;
+                board[6] = 'O';
+                break;
+            case 4:
+                spot = 8;
+                board[8] = 'O';
+                break;
+        }
     }
-    if (count >= 100)
+    else if (getMoveCount() == 1)
     {
-        findWinner(bot, channelID);
+        spot = 4;
+        board[4]  = 'O';
     }
     else {
+        for (let i = 0; i < board.length; i++)
+        {
+            if (board[i] == i + 1)
+            {
+                let boardToCheck = [];
+                for (let t = 0; t < board.length; t++)
+                {
+                    boardToCheck[t] = board[t];
+                }
+                boardToCheck[i] = 'X';
+                let isWinner = findWinner('X', boardToCheck);
+                if (isWinner)
+                {
+                    spot = i;
+                    board[i] = 'O';
+                    break;
+                }
+            }
+        }
+    }
+    if (!spot)
+    {
+        do {
+            spot = Math.floor(Math.random() * board.length);
+        } while (board[spot] != spot + 1);
         board[spot] = 'O';
     }
 }
 
-function findWinner(bot, channelID, user)
-{       
-    if ((board[0] == user &&
-        board[1] == user &&
-        board[2] == user) // top row
-         ||
-        (board[3] == user &&
-        board[4] == user &&
-        board[5] == user) // middle row
-        ||
-        (board[6] == user &&
-        board[7] == user &&
-        board[8] == user) // bottom row
-        || 
-        (board[0] == user &&
-        board[4] == user &&
-        board[8] == user) // top left to bottom right
-        ||
-        (board[0] == user &&
-        board[3] == user &&
-        board[6] == user) // first column
-        || 
-        (board[1] == user &&
-        board[4] == user &&
-        board[7] == user) // second column
-        ||
-        (board[2] == user &&
-        board[5] == user &&
-        board[8] == user) // third column
-        ||
-        (board[2] == user &&
-        board[4] == user &&
-        board[6] == user)) // top right to bottom left
+function getMoveCount()
+{
+    let result = 9;
+    for (let i = 0; i < board.length; i++)
     {
-        return user;
+        if (board[i] == i + 1)
+        {
+            --result;
+        }
     }
-    else return false;
+    return result;
+}
+
+function findWinner(user, boardToCheck)
+{
+    if ((boardToCheck[0] == user &&
+        boardToCheck[1] == user &&
+        boardToCheck[2] == user) // top row
+         ||
+        (boardToCheck[3] == user &&
+        boardToCheck[4] == user &&
+        boardToCheck[5] == user) // middle row
+        ||
+        (boardToCheck[6] == user &&
+        boardToCheck[7] == user &&
+        boardToCheck[8] == user) // bottom row
+        || 
+        (boardToCheck[0] == user &&
+        boardToCheck[4] == user &&
+        boardToCheck[8] == user) // top left to bottom right
+        ||
+        (boardToCheck[0] == user &&
+        boardToCheck[3] == user &&
+        boardToCheck[6] == user) // first column
+        || 
+        (boardToCheck[1] == user &&
+        boardToCheck[4] == user &&
+        boardToCheck[7] == user) // second column
+        ||
+        (boardToCheck[2] == user &&
+        boardToCheck[5] == user &&
+        boardToCheck[8] == user) // third column
+        ||
+        (boardToCheck[2] == user &&
+        boardToCheck[4] == user &&
+        boardToCheck[6] == user)) // top right to bottom left
+    {
+        return true;
+    }
+    else 
+    {
+        return false;
+    }
 }
 
 function resetBoard()
@@ -117,5 +175,6 @@ module.exports = {
     printBoard, 
     makeMoveUser,
     resetBoard,
-    findWinner
+    findWinner,
+    board
 }
