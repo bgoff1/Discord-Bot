@@ -44,7 +44,15 @@ function makeMoveUser(bot, message, channelID)
         });
     }
     if (!findWinner('X', board))
-        makeMoveAI();
+	{
+		let tie = makeMoveAI();
+		if (tie) {
+			bot.sendMessage({
+				to: channelID,
+				message: `Tie game! Maybe I can win next time!`
+			});
+		}
+	}       
 }
 
 function makeMoveAI()
@@ -53,33 +61,38 @@ function makeMoveAI()
     // if its the second move and the player went in the middle
     if (getMoveCount() == 1 && board[4] != '5')
     {
+        // pick a random corner
         let rand = Math.floor(Math.random() * 4) + 1;
         switch (rand)
         {
             case 1:
                 spot = 0;
-                board[0] = 'O';
+                board[spot] = 'O';
                 break;
             case 2:
                 spot = 2;
-                board[2] = 'O';
+                board[spot] = 'O';
                 break;
             case 3:
                 spot = 6;
-                board[6] = 'O';
+                board[spot] = 'O';
                 break;
             case 4:
                 spot = 8;
-                board[8] = 'O';
+                board[spot] = 'O';
                 break;
         }
     }
     else if (getMoveCount() == 1)
     {
+        // if the player didn't go in the middle,
+            // go in the middle
         spot = 4;
         board[4]  = 'O';
     }
     else {
+        // otherwise, check to see if the next move the player can win,
+        // and go in that spot
         for (let i = 0; i < board.length; i++)
         {
             if (board[i] == i + 1)
@@ -100,8 +113,14 @@ function makeMoveAI()
             }
         }
     }
-    if (!spot)
+    if (!spot && spot != 0)
     {
+        // first check if the board is full
+        if (getMoveCount() == 9)
+        {
+            return true;
+        }
+        // if no obvious blocking moves, pick a random, unoccupied spot and go there
         do {
             spot = Math.floor(Math.random() * board.length);
         } while (board[spot] != spot + 1);
