@@ -1,7 +1,8 @@
 // #region headers
 var dad = require('./dadjokes');
 var game = require('./tictactoe');
-
+var logger = require('./logger');
+var crud = require('./crudrequests');
 /**
  * @typedef {Object} params
  * @prop {string} user
@@ -17,7 +18,7 @@ var laughCount = 0, gameMode = false;
  * @param {Discord.Client} bot - Discord.Client bot
  * @param {params} $params - object containing 
  */
-function handleMessage(bot, $params)
+async function handleMessage(bot, $params)
 {
     let message = $params.message;
     if (message.substring(0, 4).toLowerCase() == "haha") {
@@ -96,12 +97,25 @@ function handleMessage(bot, $params)
                         gameMode = true;
                         game.printBoard(bot, $params);
                         break;
+                    case 'delete messages':
+                        logger.warn('Deleting messages...');
+                        let deletingMessagesIDs = [], messages = [];
+                        messages = await crud.getMessages(bot, $params.channelID)
+                        for (let message of messages) deletingMessagesIDs.push(message.id);
+                        crud.deleteMessages(bot, $params.channelID, deletingMessagesIDs);              
+                        break;
+                    case 'get':
+                        logger.info(crud.getMessages(bot, $params.channelID));
+                        break;
+                    case 'new server':
+                        logger.info(bot.createServer({icon: null, name: "test2", region: "us-central"}));
+                        break;
+                    default: break;
                 }
             }
         }
     }
 }
-
 module.exports = {
     handleMessage
 }

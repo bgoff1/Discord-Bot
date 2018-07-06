@@ -1,15 +1,8 @@
 
 var Discord = require('discord.io');
-var logger = require('winston');
 var auth = require('../config/auth.json');
-var messageModule = require('./handleMessage');
-
-// Configure logger settings
-logger.remove(logger.transports.Console);
-logger.add(logger.transports.Console, {
-    colorize: true
-});
-logger.level = 'debug';
+var messages = require('./handleMessage');
+var logger = require('./logger');
 
 // Initialize Discord Bot
 var bot = new Discord.Client({
@@ -33,7 +26,7 @@ bot.on('message', (user, userID, channelID, message, evt) => {
         "message": message,
         "event": evt
     }
-    messageModule.handleMessage(bot, $params);
+    messages.handleMessage(bot, $params);
 });
 
 // When the bot disconnects from the server, or fails to connect
@@ -43,7 +36,8 @@ bot.on('disconnect', (errMsg, code) => {
     bot.connect();
 });
 
+// When any user's presence changes
 bot.on('presence', (user, userID, status, game, event) => {
     logger.info(`user ${user} playing ${game[name]}`);
     logger.info(`status ${status}`);
-})
+});
