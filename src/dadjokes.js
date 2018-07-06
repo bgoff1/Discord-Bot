@@ -18,7 +18,7 @@ const dadjokes = require('../resources/dad');
  */
 function tellJoke(bot, $params)
 {
-    let joke = dadjokes[Math.floor(Math.random() * dadjokes.length)];
+    let joke = dadjokes.jokes[Math.floor(Math.random() * dadjokes.jokes.length)];
     if (bot && $params.channelID)
     {
         bot.sendMessage({

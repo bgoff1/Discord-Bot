@@ -1,4 +1,5 @@
 // #region headers
+"use strict";
 var logger = require('./logger');
 /**
  * @typedef {Object} Message
@@ -14,6 +15,7 @@ var logger = require('./logger');
  * @prop {*} mentions
  * @prop {number} type
  */
+const WAIT_TIME = 250;
 // #endregion
 
 /**
@@ -22,7 +24,7 @@ var logger = require('./logger');
  * @param {string} channelID
  * @returns {Promise<Message>} returns message or false
  */
-async function getMessage(bot, channelID) 
+function getMessage(bot, channelID) 
 {
     return new Promise((resolve, reject) => {
         bot.getMessage({ 'channelID': channelID }, (error, response) => 
@@ -44,7 +46,7 @@ async function getMessage(bot, channelID)
  * @param {string} channelID
  * @returns {Promise<Message[]>} returns messages or false
  */
-async function getMessages(bot, channelID)
+function getMessages(bot, channelID)
 {
     return new Promise((resolve, reject) => 
     {
@@ -66,48 +68,88 @@ async function getMessages(bot, channelID)
  * @param {Discord.Client} bot
  * @param {string} channelID 
  * @param {string} messageID - id of message to delete
- * @returns {boolean} returns success or fail
+ * @returns {Promise<boolean>} returns success or fail
  */
-async function deleteMessage(bot, channelID, messageID)
+function deleteMessage(bot, channelID, messageID)
 {
-    bot.deleteMessage({ 'channelID': channelID, 'messageID': messageID },
+    return new Promise((resolve, reject) => {
+        bot.deleteMessage({ 'channelID': channelID, 'messageID': messageID },
         (error, response) => {
             if (error) {
+                for (var prop in error.response)
+                {
+                    logger.warn(`${prop} in ${error.response} ${error.response[prop]}`);
+                }
                 logger.error(`status code - ${error.statusCode}`);
                 logger.error(`status message - ${error.statusMessage}`);
-                return false;
-            } else if (response) {
-                logger.info(response);
-                return true;
+                reject(false);
+            } else{
+                resolve(true);
             }
         });
+    });
 }
 
+// Generally deleting messages 1 at a time works better,
+    // not sure why; API is simply easier to deal with
 /**
  * Function that deletes multiple messages
  * @param {Discord.Client} bot
  * @param {string} channelID
  * @param {string[]} messageIDs - array of message ids to delete
- * @returns {boolean} returns success or failure
+ * @returns {Promise<*>} returns success or failure
  */
-async function deleteMessages(bot, channelID, messageIDs)
+function deleteMessages(bot, channelID, messageIDs)
 {
-    bot.deleteMessages({ 'channelID': channelID, 'messageIDs': messageIDs},
+    return new Promise((resolve, reject) => {
+        bot.deleteMessages({ 'channelID': channelID, 'messageIDs': messageIDs},
         (error, response) => {
             if (error) {
                 logger.error(`status code - ${error.statusCode}`);
                 logger.error(`status message - ${error.statusMessage}`);
-                return false;
+                reject(error.statusCode);
             }
-            else if (response) {
-                logger.info(response);
-                return true;
+            else {
+                if (!response)
+                    resolve(true);
+                else
+                    resolve(response);
             }
         });
+    });
 }
+
+/**
+ * Waits an amount of time
+ * @param {number} ms - amount of time to wait, in milliseconds
+ * @returns {Promise}
+ */
+function wait(ms)
+{
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Deletes all messages in the channel using the above methods
+ * @param {Discord.Client} bot
+ * @param {string} channelID
+ * @returns {void}
+ */
+async function deleteAllMessages(bot, channelID)
+{
+    logger.warn('Deleting messages...');
+    let messages = [];
+    messages = await getMessages(bot, channelID);
+    if (messages)
+    {
+        for (let message of messages) {
+            await deleteMessage(bot, channelID, message.id);
+            await wait(WAIT_TIME);
+        }
+        messages = [];
+    }
+} 
+
 module.exports = {
-    getMessage,
-    getMessages,
-    deleteMessage,
-    deleteMessages,
+    deleteAllMessages
 }

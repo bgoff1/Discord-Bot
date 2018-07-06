@@ -64,6 +64,3 @@ typings/
 # User defined ignores
 # Ignore configuration files
 /config
-
-# Ignore resource files
-/resources
