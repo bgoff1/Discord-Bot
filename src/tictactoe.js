@@ -2,7 +2,22 @@ let board = [ "1" ,  "2"  , "3"  ,
               "4" ,  "5"  , "6"  ,
               "7" ,  "8"  , "9"  ]
 
-function printBoard(bot, channelID) 
+/**
+ * @typedef {Object} params
+ * @prop {string} user
+ * @prop {string} userID
+ * @prop {string} channelID
+ * @prop {string} message
+ * @prop {WebSocketEvent} event
+ */
+
+/**
+ * 
+ * @param {Discord.Client} bot - Discord.Client bot
+ * @param {params} $params - object containing user, userID, channelID, message, and event 
+ * @returns {void}
+ */
+function printBoard(bot, $params) 
 {
     let boardToPrint = "\n----------------------\n";
     let a = 0;
@@ -25,12 +40,18 @@ function printBoard(bot, channelID)
         boardToPrint += "\n----------------------\n";
     }
     bot.sendMessage({
-        to: channelID,
+        to: $params.channelID,
         message: `${boardToPrint}`
     });
 }
-
-function makeMoveUser(bot, message, channelID) 
+/**
+ * Function that makes the user's move
+ * @param {Discord.Client} bot - Discord.Client bot
+ * @param {string} message - command passed by user
+ * @param {params} $params - object containing user, userID, channelID, message, and event
+ * @returns {void}
+ */
+function makeMoveUser(bot, message, $params) 
 {
     let slot = parseInt(message, 10) - 1;
     if (message == board[slot])
@@ -39,7 +60,7 @@ function makeMoveUser(bot, message, channelID)
     }
     else {
         bot.sendMessage({
-            to: channelID,
+            to: $params.channelID,
             message: `You cannot move in spot ${message}. Pick another location.`
         });
     }
@@ -48,13 +69,17 @@ function makeMoveUser(bot, message, channelID)
 		let tie = makeMoveAI();
 		if (tie) {
 			bot.sendMessage({
-				to: channelID,
+                to: $params.channelID,
 				message: `Tie game! Maybe I can win next time!`
 			});
 		}
 	}       
 }
 
+/**
+ * Make's the bots move intelligently
+ * @returns {void}
+ */
 function makeMoveAI()
 {
     let spot;
@@ -128,6 +153,10 @@ function makeMoveAI()
     }
 }
 
+/**
+ * Gets the number of moves still possible in the board
+ * @returns {number}
+ */
 function getMoveCount()
 {
     let result = 9;
@@ -141,9 +170,15 @@ function getMoveCount()
     return result;
 }
 
+/**
+ * Finds the winner, if exists, of the game
+ * @param {string} user 
+ * @param {string[]} boardToCheck
+ * @returns {boolean}
+ */
 function findWinner(user, boardToCheck)
 {
-    if ((boardToCheck[0] == user &&
+    return ((boardToCheck[0] == user &&
         boardToCheck[1] == user &&
         boardToCheck[2] == user) // top row
          ||
@@ -173,16 +208,13 @@ function findWinner(user, boardToCheck)
         ||
         (boardToCheck[2] == user &&
         boardToCheck[4] == user &&
-        boardToCheck[6] == user)) // top right to bottom left
-    {
-        return true;
-    }
-    else 
-    {
-        return false;
-    }
+        boardToCheck[6] == user)); // top right to bottom left
 }
 
+/**
+ * resets the board to be an array of all numbers as strings
+ * @returns {void}
+ */
 function resetBoard()
 {
     board = [ "1" , "2" , "3" ,
