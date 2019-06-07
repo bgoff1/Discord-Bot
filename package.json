@@ -6,16 +6,13 @@
     "author": "Judah Goff",
     "dependencies": {
         "btoa": "^1.2.1",
-        "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
+        "discord.io": "^2.5.3",
         "express": "^4.16.3",
         "node-fetch": "^2.1.2",
         "request": "^2.87.0",
         "winston": "^2.4.0"
     },
-    "devDependencies": {
-        "nodemon": "^1.17.5"
-    },
     "scripts": {
-        "start": "nodemon"
+        "start": "node ."
     }
 }
